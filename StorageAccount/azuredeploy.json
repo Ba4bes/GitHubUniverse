@@ -1,0 +1,58 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountPrefix": {
+            "type": "string",
+            "maxLength": 11,
+            "metadata": {
+                "description": "Prefix the storageaccount"
+            }
+        },
+        "storageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_GRS",
+                "Standard_LRS",
+                "Standard_GZRS",
+                "Standard_ZRS",
+                "Premium_LRS",
+                "Premium_ZRS",
+                "Premium_GRS",
+                "Standard_RAGRS",
+                "Standard_RAGZRS"
+            ],
+            "metadata": {
+                "description": "The sku for the storage account"
+            }
+        }
+    },
+    "variables": {
+        "storageAccountName": "[toLower(concat(parameters('storageAccountPrefix'), uniqueString(resourceGroup().id, deployment().name)))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[variables('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[variables('storageAccountName')]",
+                "ARMcreated": "True"
+            },
+            "kind": "StorageV2",
+            "sku": {
+                "name": "[parameters('storageAccountType')]",
+                "tier": "Standard"
+            }
+        }
+    ],
+    "outputs": {
+        "storageAccount": {
+            "type": "string",
+            "value": "[variables('storageAccountName')]"
+        }
+
+    }
+}
